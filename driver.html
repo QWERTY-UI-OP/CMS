@@ -5,24 +5,43 @@
     <title>Driver Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container mx-auto">
-        <h1 class="text-2xl font-bold">Driver Dashboard</h1>
-        <div id="bookingsList" class="mt-4"></div>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">Driver Dashboard</h1>
+
+        <!-- Bookings List -->
+        <div id="bookingsList" class="grid gap-4"></div>
     </div>
+
     <script>
         async function loadMyBookings() {
-            const response = await fetch('/my-bookings');
-            const bookings = await response.json();
-            const bookingsList = document.getElementById('bookingsList');
-            bookingsList.innerHTML = '';
-            bookings.forEach(booking => {
-                const bookingItem = document.createElement('div');
-                bookingItem.textContent = `Name: ${booking.name}, Pickup: ${booking.pickup_location}, Dropoff: ${booking.dropoff_location}`;
-                bookingsList.appendChild(bookingItem);
-            });
+            try {
+                const response = await fetch('/my-bookings');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch bookings');
+                }
+                const bookings = await response.json();
+                const bookingsList = document.getElementById('bookingsList');
+                bookingsList.innerHTML = '';
+                bookings.forEach(booking => {
+                    const bookingItem = document.createElement('div');
+                    bookingItem.className = 'border p-4 rounded-md';
+                    bookingItem.innerHTML = `
+                        <p class="text-lg font-bold">Booking Details</p>
+                        <p><span class="font-bold">Name:</span> ${booking.name}</p>
+                        <p><span class="font-bold">Pickup Location:</span> ${booking.pickup_location}</p>
+                        <p><span class="font-bold">Dropoff Location:</span> ${booking.dropoff_location}</p>
+                    `;
+                    bookingsList.appendChild(bookingItem);
+                });
+            } catch (error) {
+                console.error('Error loading bookings:', error.message);
+                const bookingsList = document.getElementById('bookingsList');
+                bookingsList.innerHTML = '<p class="text-red-500">Failed to load bookings. Please try again later.</p>';
+            }
         }
 
+        // Initial load of bookings
         loadMyBookings();
     </script>
 </body>

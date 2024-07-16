@@ -34,7 +34,7 @@ app.use(session({
 
 // Create default admin user
 async function createDefaultAdmin() {
-    const adminUsername = 'admin';
+    const adminUsername = 'saatwik';
     const adminPassword = '12345';
 
     db.query('SELECT * FROM users WHERE name = ? AND role = ?', [adminUsername, 'admin'], async (err, results) => {

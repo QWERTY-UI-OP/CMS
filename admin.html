@@ -5,31 +5,49 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container mx-auto">
-        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
-        <h2 class="text-xl mt-4">Create Cab Driver</h2>
-        <form id="driverForm" class="mb-4">
-            <input type="text" id="name" placeholder="Driver Name" class="border p-2">
-            <input type="text" id="phone" placeholder="Driver Phone" class="border p-2">
-            <button type="button" onclick="createDriver()" class="bg-blue-500 text-white p-2">Create Driver</button>
-        </form>
-        <h2 class="text-xl mt-4">Create Booking</h2>
-        <form id="bookingForm" class="mb-4">
-            <input type="text" id="name" placeholder="Name" class="border p-2">
-            <input type="text" id="pickup_location" placeholder="Pickup Location" class="border p-2">
-            <input type="text" id="dropoff_location" placeholder="Dropoff Location" class="border p-2">
-            <input type="date" id="booking_date" class="border p-2">
-            <input type="time" id="booking_time" class="border p-2">
-            <select id="driver_id" class="border p-2"></select>
-            <button type="button" onclick="createBooking()" class="bg-blue-500 text-white p-2">Create Booking</button>
-        </form>
-        <div id="bookingsList" class="mt-4"></div>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">Admin Dashboard</h1>
+
+        <!-- Create Cab Driver Form -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Create Cab Driver</h2>
+            <form id="driverForm" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <input type="text" id="driverName" placeholder="Driver Name" class="border p-2 rounded-md">
+                <input type="text" id="driverPhone" placeholder="Driver Phone" class="border p-2 rounded-md">
+                <button type="button" onclick="createDriver()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Create Driver
+                </button>
+            </form>
+        </div>
+
+        <!-- Create Booking Form -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Create Booking</h2>
+            <form id="bookingForm" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <input type="text" id="bookingName" placeholder="Name" class="border p-2 rounded-md">
+                <input type="text" id="pickupLocation" placeholder="Pickup Location" class="border p-2 rounded-md">
+                <input type="text" id="dropoffLocation" placeholder="Dropoff Location" class="border p-2 rounded-md">
+                <input type="date" id="bookingDate" class="border p-2 rounded-md">
+                <input type="time" id="bookingTime" class="border p-2 rounded-md">
+                <select id="driverId" class="border p-2 rounded-md"></select>
+                <button type="button" onclick="createBooking()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Create Booking
+                </button>
+            </form>
+        </div>
+
+        <!-- Display Bookings -->
+        <div id="bookingsList">
+            <h2 class="text-xl font-bold mb-4">Bookings List</h2>
+            <div id="bookingsItems" class="grid gap-4"></div>
+        </div>
     </div>
+
     <script>
         async function createDriver() {
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+            const name = document.getElementById('driverName').value;
+            const phone = document.getElementById('driverPhone').value;
 
             const response = await fetch('/drivers', {
                 method: 'POST',
@@ -42,18 +60,19 @@
             if (response.ok) {
                 alert('Driver created successfully!');
                 document.getElementById('driverForm').reset();
+                loadDrivers();
             } else {
                 alert('Error creating driver');
             }
         }
 
         async function createBooking() {
-            const name = document.getElementById('name').value;
-            const pickup_location = document.getElementById('pickup_location').value;
-            const dropoff_location = document.getElementById('dropoff_location').value;
-            const booking_date = document.getElementById('booking_date').value;
-            const booking_time = document.getElementById('booking_time').value;
-            const driver_id = document.getElementById('driver_id').value;
+            const name = document.getElementById('bookingName').value;
+            const pickup_location = document.getElementById('pickupLocation').value;
+            const dropoff_location = document.getElementById('dropoffLocation').value;
+            const booking_date = document.getElementById('bookingDate').value;
+            const booking_time = document.getElementById('bookingTime').value;
+            const driver_id = document.getElementById('driverId').value;
 
             const response = await fetch('/bookings', {
                 method: 'POST',
@@ -66,6 +85,7 @@
             if (response.ok) {
                 alert('Booking created successfully!');
                 document.getElementById('bookingForm').reset();
+                loadBookings();
             } else {
                 alert('Error creating booking');
             }
@@ -74,7 +94,7 @@
         async function loadDrivers() {
             const response = await fetch('/drivers');
             const drivers = await response.json();
-            const driverSelect = document.getElementById('driver_id');
+            const driverSelect = document.getElementById('driverId');
             driverSelect.innerHTML = '';
             drivers.forEach(driver => {
                 const option = document.createElement('option');
@@ -87,15 +107,17 @@
         async function loadBookings() {
             const response = await fetch('/bookings');
             const bookings = await response.json();
-            const bookingsList = document.getElementById('bookingsList');
-            bookingsList.innerHTML = '';
+            const bookingsItems = document.getElementById('bookingsItems');
+            bookingsItems.innerHTML = '';
             bookings.forEach(booking => {
                 const bookingItem = document.createElement('div');
+                bookingItem.className = 'border p-4 rounded-md';
                 bookingItem.textContent = `Name: ${booking.name}, Pickup: ${booking.pickup_location}, Dropoff: ${booking.dropoff_location}, Driver: ${booking.driver_name}`;
-                bookingsList.appendChild(bookingItem);
+                bookingsItems.appendChild(bookingItem);
             });
         }
 
+        // Initial load
         loadDrivers();
         loadBookings();
     </script>
